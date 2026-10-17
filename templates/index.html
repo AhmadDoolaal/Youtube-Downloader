@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTDownload | Fantastico YouTube to MP3 & MP4</title>
+    <meta name="description" content="Download YouTube videos as MP3 or MP4 in your choice of quality.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Animated mesh gradient background -->
+    <div class="mesh-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="wrap">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <div class="brand-mark">YT</div>
+                <div class="brand-text">YT<span>Download</span></div>
+            </div>
+            <div class="nav-status" id="navStatus">
+                <span class="dot"></span>
+                <span id="ffmpegText">Checking FFmpeg...</span>
+            </div>
+        </nav>
+
+        <main class="container">
+            <header class="page-header">
+                <h1>Download <span class="gradient-text">YouTube</span> Videos</h1>
+                <p class="sub">Paste a YouTube link and grab the MP3 or MP4 in any quality you want.</p>
+            </header>
+
+            <!-- Card -->
+            <article class="glass-card" id="mainCard">
+                <div class="card-body">
+                    <!-- URL Input -->
+                    <div class="input-group">
+                        <label class="field-label">YouTube Video Link</label>
+                        <div class="field-wrap">
+                            <input
+                                type="url"
+                                id="videoUrl"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                autocomplete="off"
+                                spellcheck="false"
+                            >
+                            <button type="button" class="btn paste-btn" id="pasteBtn" title="Paste">&#128203;</button>
+                            <button type="button" class="btn fetch-btn" id="fetchBtn">Get Info</button>
+                        </div>
+                        <div class="input-hint">Supports youtube.com and youtu.be links</div>
+                    </div>
+
+                    <!-- Video Preview (hidden until info fetched) -->
+                    <div class="video-preview" id="videoPreview" style="display:none;">
+                        <div class="preview-thumb-wrap">
+                            <img id="previewThumb" src="" alt="Video thumbnail">
+                            <div class="preview-duration" id="previewDuration">--:--</div>
+                        </div>
+                        <div class="preview-info">
+                            <h3 id="previewTitle">Video Title</h3>
+                            <p class="preview-channel" id="previewChannel">Channel</p>
+                            <p class="preview-meta" id="previewMeta">0 views &bull; 0:00</p>
+                        </div>
+                        <div class="preview-actions">
+                            <button type="button" class="btn change-btn" id="changeBtn">Change Link</button>
+                        </div>
+                    </div>
+
+                    <!-- Format & Quality Selector -->
+                    <div class="selector-section" id="selectorSection" style="display:none;">
+                        <div class="section-title">Choose Format &amp; Quality</div>
+
+                        <!-- Format Toggle -->
+                        <div class="format-toggle">
+                            <button type="button" class="fmt-btn active" data-fmt="mp4" id="fmtMp4">
+                                <span class="fmt-icon">&#127917;</span>
+                                <span class="fmt-label">MP4 Video</span>
+                            </button>
+                            <button type="button" class="fmt-btn" data-fmt="mp3" id="fmtMp3">
+                                <span class="fmt-icon">&#127925;</span>
+                                <span class="fmt-label">MP3 Audio</span>
+                            </button>
+                        </div>
+
+                        <!-- Quality Pills -->
+                        <div class="quality-wrap">
+                            <label class="quality-label">Video Quality <span class="req-star" id="reqStar">*</span></label>
+                            <div class="quality-pills" id="qualityPills">
+                                <!-- injected by JS -->
+                            </div>
+                            <p class="quality-hint" id="qualityHint">Select the resolution you want.</p>
+                        </div>
+                    </div>
+
+                    <!-- Download Button -->
+                    <div class="download-zone" id="downloadZone" style="display:none;">
+                        <button type="button" class="btn download-btn" id="downloadBtn" disabled>
+                            <span class="btn-icon">&#8594;</span>
+                            <span class="btn-label">Start Download</span>
+                        </button>
+                        <p class="zone-hint" id="zoneHint">Pick a format and quality to enable download.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Download Progress Overlay -->
+            <div class="progress-overlay" id="progressOverlay" style="display:none;">
+                <div class="progress-card glass-card">
+                    <div class="progress-header">
+                        <span class="progress-title" id="progressTitle">Preparing download...</span>
+                        <span class="progress-fmt" id="progressFmt">--</span>
+                    </div>
+                    <div class="progress-body">
+                        <div class="ring-wrap">
+                            <svg class="progress-ring" id="progressRing">
+                                <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+                                <circle class="ring-fg" cx="60" cy="60" r="52" id="ringFg"></circle>
+                            </svg>
+                            <span class="ring-percent" id="ringPercent">0%</span>
+                        </div>
+                        <div class="progress-detail">
+                            <div class="detail-row">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value" id="detailStatus">Starting...</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Speed</span>
+                                <span class="detail-value" id="detailSpeed">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">ETA</span>
+                                <span class="detail-value" id="detailEta">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-footer">
+                        <button type="button" class="btn ghost-btn" id="cancelBtn">Cancel</button>
+                        <button type="button" class="btn download-again-btn" id="downloadAgainBtn" style="display:none;">Download Again</button>
+                        <a href="#" class="btn open-folder-btn" id="openFolderBtn" style="display:none;">Show in Folder</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Downloads -->
+            <section class="recent-section" id="recentSection" style="display:none;">
+                <div class="section-header">
+                    <h2>Recent Downloads</h2>
+                    <button type="button" class="btn clear-btn" id="clearRecent">Clear</button>
+                </div>
+                <ul class="recent-list" id="recentList">
+                    <!-- populated by JS -->
+                </ul>
+            </section>
+
+            <!-- Footer -->
+            <footer class="page-footer">
+                <p>
+                    Made with &#10084;&nbsp;for quick YouTube downloads.
+                    <span id="ffmpegNote"></span>
+                </p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

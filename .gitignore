@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# Downloads
+downloads/
+
+# FFmpeg binary (too large for GitHub - install separately)
+ffmpeg.exe
+
+# OS
+.DS_Store
+Thumbs.db
